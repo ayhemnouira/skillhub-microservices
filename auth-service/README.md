@@ -1,323 +1,465 @@
-🔐 SkillHub Auth Service
+# 🔐 SkillHub - Professional Learning & Job Matching Platform
 
-Professional authentication microservice built with Spring Boot 3, MongoDB, and JWT
+> Enterprise-grade microservices platform built with Spring Boot 3, Spring Cloud, MongoDB, and React
 
-Afficher l'image
-Afficher l'image
-Afficher l'image
-Afficher l'image
-Afficher l'image
-📋 Overview
-SkillHub Auth Service is a production-ready authentication microservice that provides secure user authentication, email verification, password management, and JWT-based authorization. Built as part of the SkillHub platform - a professional learning and job matching system.
-✨ Key Features
+[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2023.0.0-blue.svg)](https://spring.io/projects/spring-cloud)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-green.svg)](https://www.mongodb.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-🔐 JWT Authentication - Stateless token-based authentication with HS512 algorithm
-📧 Email Verification - Secure 6-digit OTP verification with 10-minute expiry
-🔑 Password Management - BCrypt hashing (strength 12) with forgot/reset functionality
-🔄 Refresh Tokens - Long-lived tokens (7 days) for seamless user experience
-🛡️ Security - Account lockout, token rotation, CORS protection
-🐳 Docker Ready - Containerized with Docker Compose
-📊 Health Monitoring - Spring Boot Actuator integration
-🔍 Service Discovery - Eureka client for microservices architecture
+---
 
+## 📋 Project Overview
 
-🏗️ Architecture
-┌─────────────────────────────────────────────┐
-│         API Gateway (Port 8080)             │
-└────────────────┬────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────┐
-│       Auth Service (Port 8081)              │
-│  ┌──────────────────────────────────────┐  │
-│  │  JWT Security Layer                  │  │
-│  │  • Token Generation                  │  │
-│  │  • Token Validation                  │  │
-│  │  • User Authentication               │  │
-│  └──────────────────────────────────────┘  │
-│  ┌──────────────────────────────────────┐  │
-│  │  Business Logic                      │  │
-│  │  • User Registration                 │  │
-│  │  • Email Verification                │  │
-│  │  • Password Management               │  │
-│  └──────────────────────────────────────┘  │
-│  ┌──────────────────────────────────────┐  │
-│  │  MongoDB Database                    │  │
-│  │  • users                             │  │
-│  │  • verification_tokens               │  │
-│  │  • refresh_tokens                    │  │
-│  └──────────────────────────────────────┘  │
-└─────────────────────────────────────────────┘
+SkillHub is a modern microservices-based platform that connects job seekers with professional courses, certifications, and job opportunities. The system demonstrates production-ready patterns including service discovery, API gateway, distributed authentication, and inter-service communication.
 
-🚀 Quick Start
-Prerequisites
+### 🎯 Business Value
 
-Java 17 or higher
-Maven 3.6+
-Docker Desktop
-MongoDB (via Docker or local)
+- **For Job Seekers**: Discover courses, build skills, and find matching job opportunities
+- **For Recruiters**: Post jobs, review applications, and find qualified candidates
+- **For Educators**: Publish courses and track student progress
 
-Installation
+---
 
-Clone the repository
+## 🏗️ System Architecture
 
-bashgit clone https://github.com/yourusername/skillhub-auth-service.git
-cd skillhub-auth-service
+```
+┌──────────────────────────────────────────────────────────┐
+│              REACT.JS FRONTEND (Coming Soon)             │
+│         (Progressive Web App, Responsive Design)          │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────────┐
+│            API GATEWAY (Port 8080) ✅                    │
+│  ✅ JWT Validation  ✅ Rate Limiting  ✅ Circuit Breaker │
+│  ✅ Request Routing ✅ CORS          ✅ Load Balancing   │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+      ┌──────────────┼──────────────┬──────────────┐
+      │              │              │              │
+      ▼              ▼              ▼              ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+│   Auth   │  │  Course  │  │   Job    │  │  User    │
+│ Service  │  │ Service  │  │ Service  │  │ Profile  │
+│  ✅ 8081 │  │  📋 8082 │  │  📋 8083 │  │ Service  │
+│ MongoDB  │  │ MongoDB  │  │ MongoDB  │  │  📋 8084 │
+└──────────┘  └──────────┘  └──────────┘  │ MongoDB  │
+      │              │              │      └──────────┘
+      │              ▼              ▼              │
+      │        ┌──────────┐  ┌──────────┐        │
+      │        │Enrollment│  │Application│       │
+      │        │ Service  │  │  Service │       │
+      │        │  📋 8085 │  │  📋 8086 │       │
+      │        │ MongoDB  │  │ MongoDB  │       │
+      │        └──────────┘  └──────────┘       │
+      │              │              │              │
+      └──────────────┼──────────────┼──────────────┘
+                     │              │
+                     ▼              ▼
+              ┌─────────────────────────┐
+              │  Notification Service   │
+              │        📋 8087          │
+              │   Email + WebSocket     │
+              └─────────────────────────┘
+                     │
+                     ▼
+          ┌──────────────────────┐
+          │  Service Registry    │
+          │  ✅ Eureka - 8761    │
+          └──────────────────────┘
+```
 
-Configure environment variables
+**Legend:**
+- ✅ Complete & Tested
+- 🚧 In Progress
+- 📋 Planned
 
-bash# Create .env file or set environment variables
-export MONGODB_URI=mongodb://localhost:27017/skillhub_auth
-export JWT_SECRET=your-512-bit-secret-key
-export MAIL_USERNAME=your-email@gmail.com
-export MAIL_PASSWORD=your-app-password
+---
 
-Start MongoDB with Docker
+## 🚀 Microservices Overview
 
-bashdocker-compose up -d mongodb
+| Service | Port | Database | Status | Documentation |
+|---------|------|----------|--------|---------------|
+| **Service Registry** | 8761 | - | ✅ Complete | [Eureka Dashboard](http://localhost:8761) |
+| **API Gateway** | 8080 | - | ✅ Complete | Routes all client requests |
+| **Auth Service** | 8081 | MongoDB | ✅ Complete | [View Docs](./auth-service/README.md) |
+| **User Profile Service** | 8084 | MongoDB | 📋 Planned | Skills, experience, resume |
+| **Course Service** | 8082 | MongoDB | 📋 Planned | Course catalog & reviews |
+| **Enrollment Service** | 8085 | MongoDB | 📋 Planned | Course enrollments & certificates |
+| **Job Service** | 8083 | MongoDB | 📋 Planned | Job postings & search |
+| **Application Service** | 8086 | MongoDB | 📋 Planned | Job applications tracking |
+| **Notification Service** | 8087 | - | 📋 Planned | Email & real-time notifications |
 
-Build and run
+---
 
-bashmvn clean package
-java -jar target/auth-service-1.0.0.jar
-Or run with Docker:
-bashdocker-compose up -d
+## ✨ Key Features Implemented
 
-Verify service is running
+### ✅ Service Registry (Eureka Server)
+- Service discovery and registration
+- Health monitoring dashboard
+- Load balancer integration
+- Automatic service de-registration
 
-bashcurl http://localhost:8081/actuator/health
+### ✅ API Gateway (Spring Cloud Gateway)
+- Centralized routing to all microservices
+- JWT token validation
+- Rate limiting (Resilience4j)
+- Circuit breaker pattern
+- CORS configuration
+- Request/Response logging
 
-📡 API Endpoints
-Authentication Endpoints
-MethodEndpointDescriptionAuth RequiredPOST/api/auth/registerRegister new userNoPOST/api/auth/verify-emailVerify email with OTPNoPOST/api/auth/loginLogin and get tokensNoPOST/api/auth/forgot-passwordRequest password resetNoPOST/api/auth/reset-passwordReset password with tokenNoPOST/api/auth/refresh-tokenRefresh access tokenNoPOST/api/auth/logoutLogout userYesGET/api/auth/validate-tokenValidate JWT tokenYes
-Example Requests
-Register User
-bashPOST /api/auth/register
-Content-Type: application/json
+### ✅ Auth Service
+- **User Registration** with email verification (6-digit OTP)
+- **JWT Authentication** (Access + Refresh tokens)
+- **Password Management** (BCrypt hashing, forgot/reset flow)
+- **Role-Based Access Control** (USER, RECRUITER, ADMIN)
+- **Account Security** (lockout after failed attempts)
+- **Token Refresh** mechanism
+- **Logout** with token blacklist
 
-{
-"email": "user@example.com",
-"password": "SecurePass@123",
-"role": "USER"
-}
-Login
-bashPOST /api/auth/login
-Content-Type: application/json
+---
 
-{
-"email": "user@example.com",
-"password": "SecurePass@123"
-}
-Response:
-json{
-"accessToken": "eyJhbGciOiJIUzUxMiJ9...",
-"refreshToken": "550e8400-e29b-41d4-a716...",
-"tokenType": "Bearer",
-"userId": "507f1f77bcf86cd799439011",
-"email": "user@example.com",
-"roles": ["USER"],
-"status": "ACTIVE"
-}
-Verify Email
-bashPOST /api/auth/verify-email
-Content-Type: application/json
+## 🛠️ Technology Stack
 
-{
-"email": "user@example.com",
-"otp": "123456"
-}
+### Backend
+- **Java 17** - Modern Java features (Records, Text Blocks, Pattern Matching)
+- **Spring Boot 3.2.0** - Application framework
+- **Spring Cloud Gateway** - API Gateway
+- **Spring Cloud Netflix Eureka** - Service discovery
+- **Spring Security 6** - Authentication & authorization
+- **Spring Data MongoDB** - Database access
+- **JJWT 0.12.3** - JWT token implementation
+- **Resilience4j** - Circuit breaker & rate limiting
+- **Spring Mail** - Email integration
 
-🔐 Security Features
-Password Security
+### Database
+- **MongoDB 7.0** - NoSQL document database (one database per service)
 
-BCrypt Hashing: Strength 12 rounds (OWASP recommended)
-Password Policy: Minimum 8 characters, uppercase, lowercase, digit, special character
-Salt Generation: Automatic per-password salt
+### DevOps & Tools
+- **Maven** - Dependency management
+- **Docker** - Containerization (optional)
+- **Postman** - API testing
+- **Git** - Version control
 
-JWT Tokens
+### Frontend (Planned)
+- **React 18** with Vite
+- **Tailwind CSS** - Styling
+- **Axios** - HTTP client
+- **React Router** - Navigation
 
-Algorithm: HS512 (512-bit HMAC)
-Access Token: 24 hours expiry
-Refresh Token: 7 days expiry, stored in database
-Token Rotation: Refresh tokens rotated on use
+---
 
-Account Security
+## 🚀 Getting Started
 
-Email Verification: Required before first login
-Account Lockout: 5 failed login attempts
-OTP Expiry: 6-digit codes expire in 10 minutes
-Password Reset: Secure UUID tokens with 1-hour expiry
+### Prerequisites
 
+Ensure you have the following installed:
+- **Java 17** or higher ([Download](https://www.oracle.com/java/technologies/downloads/))
+- **Maven 3.6+** ([Download](https://maven.apache.org/download.cgi))
+- **MongoDB** ([Download](https://www.mongodb.com/try/download/community) or use Docker)
+- **Git** ([Download](https://git-scm.com/downloads))
+- **Postman** (optional, for API testing)
 
-🛠️ Technology Stack
-Backend
+### Installation Steps
 
-Java 17 - Modern Java features
-Spring Boot 3.2.0 - Application framework
-Spring Security 6 - Authentication & authorization
-Spring Data MongoDB - Database access
-JJWT 0.12.3 - JWT implementation
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/skillhub-microservices.git
+cd skillhub-microservices
+```
 
-Database
+2. **Start MongoDB**
 
-MongoDB 7.0 - NoSQL document database
+Using Docker:
+```bash
+docker run -d -p 27017:27017 --name mongodb mongo:7.0
+```
 
-DevOps
+Or start your local MongoDB instance.
 
-Docker - Containerization
-Docker Compose - Multi-container orchestration
-Spring Cloud Eureka - Service discovery
-Spring Boot Actuator - Health monitoring
-
-Email
-
-Spring Mail - Email integration
-Gmail SMTP - Email delivery
-
-
-📂 Project Structure
-auth-service/
-├── src/main/java/com/skillhub/auth/
-│   ├── config/              # Configuration classes
-│   ├── controller/          # REST controllers
-│   ├── dto/                 # Data transfer objects
-│   ├── entity/              # MongoDB entities
-│   ├── exception/           # Exception handling
-│   ├── repository/          # Database repositories
-│   ├── security/            # Security components
-│   ├── service/             # Business logic
-│   └── util/                # Utility classes
-├── src/main/resources/
-│   ├── application.yml      # Main configuration
-│   └── application-*.yml    # Environment configs
-├── docker-compose.yml       # Docker configuration
-├── Dockerfile              # Container build file
-└── pom.xml                 # Maven dependencies
-
-⚙️ Configuration
-Environment Variables
-VariableDescriptionRequiredDefaultMONGODB_URIMongoDB connection stringYesmongodb://localhost:27017/skillhub_authJWT_SECRETSecret key for JWT signing (512-bit)Yes-MAIL_USERNAMEEmail account usernameYes-MAIL_PASSWORDEmail account password/app passwordYes-SPRING_PROFILES_ACTIVEActive Spring profileNodev
-Gmail SMTP Setup
-
-Enable 2-Factor Authentication
-Generate App Password: https://myaccount.google.com/apppasswords
-Use the 16-character password in configuration
-
-
-🧪 Testing
-Run Tests
-bashmvn test
-Manual Testing with cURL
-Health Check:
-bashcurl http://localhost:8081/actuator/health
-Register User:
-bashcurl -X POST http://localhost:8081/api/auth/register \
--H "Content-Type: application/json" \
--d '{"email":"test@example.com","password":"Test@1234"}'
-Login:
-bashcurl -X POST http://localhost:8081/api/auth/login \
--H "Content-Type: application/json" \
--d '{"email":"test@example.com","password":"Test@1234"}'
-
-📊 Monitoring
-Actuator Endpoints
-
-Health: /actuator/health
-Info: /actuator/info
-Metrics: /actuator/metrics
-
-Health Check Response
-json{
-"status": "UP",
-"components": {
-"mongo": {
-"status": "UP",
-"details": {
-"version": "7.0.0"
-}
-},
-"ping": {
-"status": "UP"
-}
-}
-}
-
-🐳 Docker Deployment
-Build Docker Image
-bashmvn clean package -DskipTests
-docker build -t skillhub-auth-service .
-Run with Docker Compose
-bashdocker-compose up -d
-View Logs
-bashdocker logs -f skillhub-auth-service
-Stop Services
-bashdocker-compose down
-
-🔄 Development Workflow
-
-Create Feature Branch
-
-bashgit checkout -b feature/new-feature
-
-Make Changes and Test
-
-bashmvn test
+3. **Start Service Registry (Eureka)**
+```bash
+cd service-registry
+mvn clean install
 mvn spring-boot:run
+```
+Access Eureka Dashboard at: http://localhost:8761
 
-Commit Changes
+4. **Start API Gateway**
+```bash
+cd api-gateway
+mvn clean install
+mvn spring-boot:run
+```
 
-bashgit add .
-git commit -m "feat: add new feature"
+5. **Start Auth Service**
+```bash
+cd auth-service
 
-Push to GitHub
+# Create .env file (copy from .env.example)
+cp .env.example .env
 
-bashgit push origin feature/new-feature
+# Edit .env and add your credentials:
+# MONGODB_URI=mongodb://localhost:27017/skillhub_auth
+# JWT_SECRET=your-512-bit-secret-key
+# MAIL_USERNAME=your-email@gmail.com
+# MAIL_PASSWORD=your-gmail-app-password
 
-📝 Future Enhancements
+mvn clean install
+mvn spring-boot:run
+```
 
-OAuth 2.0 integration (Google, GitHub)
-Two-factor authentication (TOTP)
-Rate limiting with Redis
-API documentation with Swagger
-Comprehensive unit and integration tests
-Grafana dashboard for monitoring
-CI/CD pipeline with GitHub Actions
-Kubernetes deployment manifests
+6. **Verify all services are running**
 
+Check Eureka Dashboard: http://localhost:8761
 
-🤝 Contributing
+You should see:
+- ✅ API-GATEWAY
+- ✅ AUTH-SERVICE
+
+---
+
+## 🔐 Environment Variables
+
+Each service requires specific environment variables. Create a `.env` file in each service directory:
+
+### Auth Service (`auth-service/.env`)
+```env
+MONGODB_URI=mongodb://localhost:27017/skillhub_auth
+JWT_SECRET=your-very-long-secret-key-at-least-512-bits-for-hs512-algorithm
+JWT_ACCESS_EXPIRATION=86400000
+JWT_REFRESH_EXPIRATION=604800000
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-gmail-app-password
+SPRING_PROFILES_ACTIVE=dev
+```
+
+### Gmail SMTP Setup
+1. Enable 2-Factor Authentication on your Gmail account
+2. Generate an App Password: https://myaccount.google.com/apppasswords
+3. Use the 16-character password in `MAIL_PASSWORD`
+
+---
+
+## 📡 API Endpoints
+
+All requests go through the API Gateway at `http://localhost:8080`
+
+### Auth Service Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/auth/register` | Register new user | No |
+| POST | `/api/auth/verify-email` | Verify email with OTP | No |
+| POST | `/api/auth/login` | Login and get JWT tokens | No |
+| POST | `/api/auth/refresh-token` | Refresh access token | No |
+| POST | `/api/auth/forgot-password` | Request password reset | No |
+| POST | `/api/auth/reset-password` | Reset password | No |
+| POST | `/api/auth/logout` | Logout and invalidate token | Yes |
+| GET | `/api/auth/validate-token` | Validate JWT token | Yes |
+
+### Example: Register a User
+
+```bash
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "SecurePass@123",
+    "role": "USER"
+  }'
+```
+
+### Example: Login
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "SecurePass@123"
+  }'
+```
+
+**Response:**
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzUxMiJ9...",
+  "refreshToken": "550e8400-e29b-41d4-a716...",
+  "tokenType": "Bearer",
+  "userId": "507f1f77bcf86cd799439011",
+  "email": "user@example.com",
+  "roles": ["USER"],
+  "status": "ACTIVE"
+}
+```
+
+---
+
+## 🧪 Testing
+
+### Health Checks
+
+**Eureka Dashboard:**
+```bash
+curl http://localhost:8761
+```
+
+**API Gateway Health:**
+```bash
+curl http://localhost:8080/actuator/health
+```
+
+**Auth Service Health:**
+```bash
+curl http://localhost:8081/actuator/health
+```
+
+### Postman Collection
+
+Import the Postman collection for complete API testing: [Coming Soon]
+
+---
+
+## 📂 Project Structure
+
+```
+skillhub-microservices/
+├── README.md                    # This file
+├── .gitignore                   # Git ignore rules
+├── docker-compose.yml           # Docker setup (optional)
+│
+├── service-registry/            # Eureka Server (Port 8761)
+│   ├── src/
+│   ├── pom.xml
+│   └── README.md
+│
+├── api-gateway/                 # Spring Cloud Gateway (Port 8080)
+│   ├── src/
+│   ├── pom.xml
+│   └── README.md
+│
+├── auth-service/                # Authentication Service (Port 8081)
+│   ├── src/
+│   ├── pom.xml
+│   ├── .gitignore
+│   ├── .env.example
+│   └── README.md                # Detailed auth docs
+│
+├── user-profile-service/        # 📋 Planned (Port 8084)
+├── course-service/              # 📋 Planned (Port 8082)
+├── enrollment-service/          # 📋 Planned (Port 8085)
+├── job-service/                 # 📋 Planned (Port 8083)
+├── application-service/         # 📋 Planned (Port 8086)
+└── notification-service/        # 📋 Planned (Port 8087)
+```
+
+---
+
+## 🔐 Security Features
+
+- ✅ **JWT Authentication** - HS512 algorithm with access & refresh tokens
+- ✅ **Password Encryption** - BCrypt with strength 12
+- ✅ **Email Verification** - 6-digit OTP with 10-minute expiry
+- ✅ **Account Lockout** - After 5 failed login attempts
+- ✅ **Token Refresh** - Seamless token renewal
+- ✅ **CORS Protection** - Configured in API Gateway
+- ✅ **Rate Limiting** - Request throttling per endpoint
+
+---
+
+## 🚀 Roadmap
+
+### Phase 1: Foundation ✅ (Completed)
+- [x] Service Registry (Eureka)
+- [x] API Gateway with security
+- [x] Auth Service with JWT
+
+### Phase 2: Core Services 📋 (In Progress)
+- [ ] User Profile Service
+- [ ] Course Service with reviews
+- [ ] Enrollment Service with Saga pattern
+
+### Phase 3: Job Matching 📋 (Planned)
+- [ ] Job Service
+- [ ] Application Service with workflow
+- [ ] Recommendation algorithm
+
+### Phase 4: Notifications & Advanced Features 📋 (Planned)
+- [ ] Notification Service (Email + WebSocket)
+- [ ] Circuit breaker patterns
+- [ ] Distributed tracing
+- [ ] Caching with Redis
+
+### Phase 5: Frontend & DevOps 📋 (Planned)
+- [ ] React.js frontend
+- [ ] Docker Compose setup
+- [ ] CI/CD pipeline
+- [ ] Kubernetes manifests
+
+---
+
+## 🤝 Contributing
+
 Contributions are welcome! Please follow these steps:
 
-Fork the repository
-Create a feature branch (git checkout -b feature/AmazingFeature)
-Commit your changes (git commit -m 'feat: add AmazingFeature')
-Push to the branch (git push origin feature/AmazingFeature)
-Open a Pull Request
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'feat: add AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
+### Commit Message Convention
+- `feat:` - New feature
+- `fix:` - Bug fix
+- `docs:` - Documentation changes
+- `refactor:` - Code refactoring
+- `test:` - Adding tests
+- `chore:` - Maintenance tasks
 
-📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
 
-👤 Author
-Your Name
+## 📄 License
 
-GitHub: @yourusername
-LinkedIn: Your Name
-Email: your.email@example.com
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+---
 
-🙏 Acknowledgments
+## 👤 Author
 
-Spring Boot team for excellent documentation
-MongoDB for flexible NoSQL database
-JWT.io for JWT debugging tools
-The open-source community
+**Your Name**
+- GitHub: [@yourusername](https://github.com/yourusername)
+- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
+- Email: your.email@example.com
 
+---
 
-📞 Support
-For support, email your.email@example.com or open an issue in the GitHub repository.
+## 🙏 Acknowledgments
+
+- Spring Boot & Spring Cloud teams for excellent frameworks
+- MongoDB for flexible NoSQL database
+- The open-source community for inspiration
+- [Add any other acknowledgments]
+
+---
+
+## 📞 Support
+
+For questions or support:
+- 📧 Email: your.email@example.com
+- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/skillhub-microservices/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/yourusername/skillhub-microservices/discussions)
+
+---
 
 <div align="center">
-⭐ Star this repository if you find it helpful!
-Made with ❤️ for the SkillHub Platform
+
+**⭐ Star this repository if you find it helpful!**
+
+Made with ❤️ using Spring Boot & Microservices Architecture
+
+[Report Bug](https://github.com/yourusername/skillhub-microservices/issues) · [Request Feature](https://github.com/yourusername/skillhub-microservices/issues)
+
 </div>
