@@ -44,7 +44,7 @@ SkillHub is a modern microservices-based platform that connects job seekers with
 │   Auth   │  │  Course  │  │   Job    │  │  User    │
 │ Service  │  │ Service  │  │ Service  │  │ Profile  │
 │  ✅ 8081 │  │  📋 8082 │  │  📋 8083 │  │ Service  │
-│ MongoDB  │  │ MongoDB  │  │ MongoDB  │  │  📋 8084 │
+│ MongoDB  │  │ MongoDB  │  │ MongoDB  │  │  ✅ 8084 │
 └──────────┘  └──────────┘  └──────────┘  │ MongoDB  │
       │              │              │      └──────────┘
       │              ▼              ▼              │
@@ -85,7 +85,7 @@ SkillHub is a modern microservices-based platform that connects job seekers with
 | **Service Registry** | 8761 | - | ✅ Complete | [Eureka Dashboard](http://localhost:8761) |
 | **API Gateway** | 8080 | - | ✅ Complete | Routes all client requests |
 | **Auth Service** | 8081 | MongoDB | ✅ Complete | [View Docs](./auth-service/README.md) |
-| **User Profile Service** | 8084 | MongoDB | 📋 Planned | Skills, experience, resume |
+| **User Profile Service** | 8084 | MongoDB | ✅ Complete | [View Docs](./user-profile-service/README.md) |
 | **Course Service** | 8082 | MongoDB | 📋 Planned | Course catalog & reviews |
 | **Enrollment Service** | 8085 | MongoDB | 📋 Planned | Course enrollments & certificates |
 | **Job Service** | 8083 | MongoDB | 📋 Planned | Job postings & search |
@@ -118,6 +118,18 @@ SkillHub is a modern microservices-based platform that connects job seekers with
 - **Account Security** (lockout after failed attempts)
 - **Token Refresh** mechanism
 - **Logout** with token blacklist
+
+### ✅ User Profile Service ⭐ NEW!
+- **Profile Management** (CRUD operations)
+- **Skills Management** (add/remove with case-insensitive deduplication)
+- **Experience Tracking** (full work history with CRUD)
+- **Education Management** (academic background)
+- **Profile Completion Algorithm** (0-100% gamification score like LinkedIn!)
+- **Resume Upload** capability
+- **Recruiter Search** (find candidates by skills/location)
+- **MongoDB Embedded Documents** (optimized data structure)
+- **Global Exception Handling** (consistent error responses)
+- **Bean Validation** (input validation at DTO layer)
 
 ---
 
@@ -197,27 +209,27 @@ mvn spring-boot:run
 5. **Start Auth Service**
 ```bash
 cd auth-service
-
-# Create .env file (copy from .env.example)
 cp .env.example .env
-
-# Edit .env and add your credentials:
-# MONGODB_URI=mongodb://localhost:27017/skillhub_auth
-# JWT_SECRET=your-512-bit-secret-key
-# MAIL_USERNAME=your-email@gmail.com
-# MAIL_PASSWORD=your-gmail-app-password
-
+# Edit .env with your credentials
 mvn clean install
 mvn spring-boot:run
 ```
 
-6. **Verify all services are running**
+6. **Start User Profile Service** 
+```bash
+cd user-profile-service
+mvn clean install
+mvn spring-boot:run
+```
+
+7. **Verify all services are running**
 
 Check Eureka Dashboard: http://localhost:8761
 
 You should see:
 - ✅ API-GATEWAY
 - ✅ AUTH-SERVICE
+- ✅ USER-PROFILE-SERVICE
 
 ---
 
@@ -236,10 +248,11 @@ MAIL_PASSWORD=your-gmail-app-password
 SPRING_PROFILES_ACTIVE=dev
 ```
 
-### Gmail SMTP Setup
-1. Enable 2-Factor Authentication on your Gmail account
-2. Generate an App Password: https://myaccount.google.com/apppasswords
-3. Use the 16-character password in `MAIL_PASSWORD`
+### User Profile Service (`user-profile-service/.env`)
+```env
+MONGODB_URI=mongodb://localhost:27017/skillhub_profiles
+SPRING_PROFILES_ACTIVE=dev
+```
 
 ---
 
@@ -260,40 +273,40 @@ All requests go through the API Gateway at `http://localhost:8080`
 | POST | `/api/auth/logout` | Logout and invalidate token | Yes |
 | GET | `/api/auth/validate-token` | Validate JWT token | Yes |
 
-### Example: Register a User
+### User Profile Service Endpoints ⭐ NEW!
 
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/profiles` | Create profile | Yes |
+| GET | `/api/profiles/user/{userId}` | Get profile by userId | Yes |
+| GET | `/api/profiles/{id}` | Get profile by profileId | Yes |
+| PUT | `/api/profiles/{id}` | Update profile | Yes |
+| DELETE | `/api/profiles/{id}` | Delete profile | Yes |
+| POST | `/api/profiles/{id}/skills` | Add skill | Yes |
+| DELETE | `/api/profiles/{id}/skills/{skill}` | Remove skill | Yes |
+| POST | `/api/profiles/{id}/experience` | Add experience | Yes |
+| PUT | `/api/profiles/{id}/experience/{expId}` | Update experience | Yes |
+| DELETE | `/api/profiles/{id}/experience/{expId}` | Delete experience | Yes |
+| POST | `/api/profiles/{id}/education` | Add education | Yes |
+| PUT | `/api/profiles/{id}/education/{eduId}` | Update education | Yes |
+| DELETE | `/api/profiles/{id}/education/{eduId}` | Delete education | Yes |
+| GET | `/api/profiles/{id}/completion` | Get completion % | Yes |
+| GET | `/api/profiles/search/skills?skills=Java,Spring` | Search by skills | Yes |
+| GET | `/api/profiles/search/location?location=Tunis` | Search by location | Yes |
+
+### Example: Create Profile
 ```bash
-curl -X POST http://localhost:8080/api/auth/register \
+curl -X POST http://localhost:8080/api/profiles \
   -H "Content-Type: application/json" \
+  -H "X-User-Id: 673f4e8a9b1c2d3e4f5a6b7c" \
   -d '{
-    "email": "user@example.com",
-    "password": "SecurePass@123",
-    "role": "USER"
+    "firstName": "Ahmed",
+    "lastName": "Ben Salem",
+    "title": "Junior Java Developer",
+    "bio": "Passionate about microservices",
+    "phoneNumber": "+216 12 345 678",
+    "location": "Tunis, Tunisia"
   }'
-```
-
-### Example: Login
-
-```bash
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "SecurePass@123"
-  }'
-```
-
-**Response:**
-```json
-{
-  "accessToken": "eyJhbGciOiJIUzUxMiJ9...",
-  "refreshToken": "550e8400-e29b-41d4-a716...",
-  "tokenType": "Bearer",
-  "userId": "507f1f77bcf86cd799439011",
-  "email": "user@example.com",
-  "roles": ["USER"],
-  "status": "ACTIVE"
-}
 ```
 
 ---
@@ -317,9 +330,10 @@ curl http://localhost:8080/actuator/health
 curl http://localhost:8081/actuator/health
 ```
 
-### Postman Collection
-
-Import the Postman collection for complete API testing: [Coming Soon]
+**User Profile Service Health:**
+```bash
+curl http://localhost:8084/actuator/health
+```
 
 ---
 
@@ -331,24 +345,52 @@ skillhub-microservices/
 ├── .gitignore                   # Git ignore rules
 ├── docker-compose.yml           # Docker setup (optional)
 │
-├── service-registry/            # Eureka Server (Port 8761)
+├── service-registry/            # Eureka Server (Port 8761) ✅
 │   ├── src/
 │   ├── pom.xml
 │   └── README.md
 │
-├── api-gateway/                 # Spring Cloud Gateway (Port 8080)
+├── api-gateway/                 # Spring Cloud Gateway (Port 8080) ✅
 │   ├── src/
 │   ├── pom.xml
 │   └── README.md
 │
-├── auth-service/                # Authentication Service (Port 8081)
+├── auth-service/                # Authentication Service (Port 8081) ✅
 │   ├── src/
 │   ├── pom.xml
 │   ├── .gitignore
 │   ├── .env.example
-│   └── README.md                # Detailed auth docs
+│   └── README.md
 │
-├── user-profile-service/        # 📋 Planned (Port 8084)
+├── user-profile-service/        # User Profile Service (Port 8084) ✅ NEW!
+│   ├── src/
+│   │   └── main/
+│   │       ├── java/com/skillhub/profile/
+│   │       │   ├── UserProfileServiceApplication.java
+│   │       │   ├── controller/
+│   │       │   │   └── ProfileController.java
+│   │       │   ├── service/
+│   │       │   │   ├── ProfileService.java
+│   │       │   │   └── ProfileServiceImpl.java
+│   │       │   ├── repository/
+│   │       │   │   └── ProfileRepository.java
+│   │       │   ├── model/
+│   │       │   │   ├── UserProfile.java
+│   │       │   │   ├── Experience.java
+│   │       │   │   └── Education.java
+│   │       │   ├── dto/
+│   │       │   │   ├── ProfileRequest.java
+│   │       │   │   ├── ExperienceRequest.java
+│   │       │   │   ├── EducationRequest.java
+│   │       │   │   └── ErrorResponse.java
+│   │       │   └── exception/
+│   │       │       ├── ProfileNotFoundException.java
+│   │       │       └── GlobalExceptionHandler.java
+│   │       └── resources/
+│   │           └── application.yml
+│   ├── pom.xml
+│   └── README.md
+│
 ├── course-service/              # 📋 Planned (Port 8082)
 ├── enrollment-service/          # 📋 Planned (Port 8085)
 ├── job-service/                 # 📋 Planned (Port 8083)
@@ -367,6 +409,8 @@ skillhub-microservices/
 - ✅ **Token Refresh** - Seamless token renewal
 - ✅ **CORS Protection** - Configured in API Gateway
 - ✅ **Rate Limiting** - Request throttling per endpoint
+- ✅ **Input Validation** - Bean Validation at DTO layer
+- ✅ **Global Exception Handling** - Consistent error responses
 
 ---
 
@@ -377,8 +421,8 @@ skillhub-microservices/
 - [x] API Gateway with security
 - [x] Auth Service with JWT
 
-### Phase 2: Core Services 📋 (In Progress)
-- [ ] User Profile Service
+### Phase 2: Core Services 🚧 (In Progress - 50% Complete)
+- [x] User Profile Service ✅ **JUST COMPLETED!**
 - [ ] Course Service with reviews
 - [ ] Enrollment Service with Saga pattern
 
@@ -398,6 +442,28 @@ skillhub-microservices/
 - [ ] Docker Compose setup
 - [ ] CI/CD pipeline
 - [ ] Kubernetes manifests
+
+---
+
+## 💡 Key Architectural Decisions
+
+### Why MongoDB?
+- Document database perfect for nested data (Experience, Education)
+- No JOINs needed (embedded documents)
+- Flexible schema for evolving requirements
+- Horizontal scaling capability
+
+### Why Microservices?
+- **Independent Scaling**: Profile service can scale separately from Auth
+- **Technology Flexibility**: Each service can use different tech stack
+- **Team Independence**: Different teams work on different services
+- **Fault Isolation**: If one service fails, others continue working
+
+### Why Embedded Documents (Experience/Education)?
+- Always queried together with profile
+- Eliminates expensive JOINs
+- Atomic updates (update profile + experience in one operation)
+- Better performance (one database query instead of three)
 
 ---
 
