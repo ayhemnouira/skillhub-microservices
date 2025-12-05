@@ -1,33 +1,98 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+####################################
+# Global Ignored Files
+####################################
+*.log
+*.tmp
+*.swp
+*.bak
+*.pid
+*.seed
+*.out
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+####################################
+# IDE / Editors
+####################################
+# IntelliJ IDEA
+.idea/
 *.iml
 *.ipr
+*.iws
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# VSCode
 .vscode/
+
+####################################
+# OS-generated files
+####################################
+.DS_Store
+Thumbs.db
+
+####################################
+# Java / Maven / Gradle
+####################################
+target/
+build/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+.settings/
+.classpath
+.project
+
+####################################
+# Spring Boot Configuration (VERY IMPORTANT)
+####################################
+# Ignore all application.yml / application.yaml in all services
+**/application.yml
+**/application.yaml
+**/bootstrap.yml
+**/bootstrap.yaml
+
+# Optional: ignore application properties too
+**/application.properties
+**/bootstrap.properties
+
+####################################
+# Logs
+####################################
+logs/
+**/logs/
+*.log
+*.error
+*.trace
+
+####################################
+# Docker
+####################################
+docker-data/
+docker-compose.override.yml
+*.env
+.env
+
+####################################
+# Node.js (Angular / React)
+####################################
+node_modules/
+dist/
+build/
+npm-debug.log
+yarn-error.log
+.pnpm-store/
+.next/
+out/
+
+####################################
+# Microservice-specific ignore
+####################################
+# Ignore local runtime files
+**/tmp/
+**/cache/
+**/data/
+
+####################################
+# Testing
+####################################
+coverage/
+test-output/
