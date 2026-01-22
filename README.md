@@ -498,7 +498,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Ayhem Nouira**
 - GitHub: [@ayhemnouira](https://github.com/ayhemnouira)
 - LinkedIn: [linkedin.com/in/ayhemnouira](https://www.linkedin.com/in/ayhemnouira/)
-- Email: ayhemnouira9@gmail.com
 
 ---
 
@@ -513,7 +512,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For questions or support:
-- 📧 Email: ayhemnouira9@gmail.com
 - 🐛 Issues: [GitHub Issues](https://github.com/ayhemnouira/skillhub-microservices/issues)
 - 💬 Discussions: [GitHub Discussions](https://github.com/ayhemnouira/skillhub-microservices/discussions)
 
