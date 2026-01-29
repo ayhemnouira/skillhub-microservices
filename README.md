@@ -1,10 +1,10 @@
 # 🔐 SkillHub - Professional Learning & Job Matching Platform
 
-> Enterprise-grade microservices platform built with Spring Boot 4, Spring Cloud, MongoDB, and React
+> Enterprise-grade microservices platform built with Spring Boot 3, Spring Cloud, MongoDB, and React
 
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2025.0.0-blue.svg)](https://spring.io/projects/spring-cloud)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2023.0.0-blue.svg)](https://spring.io/projects/spring-cloud)
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.0-green.svg)](https://www.mongodb.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -43,7 +43,7 @@ SkillHub is a modern microservices-based platform that connects job seekers with
 ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
 │   Auth   │  │  Course  │  │   Job    │  │  User    │
 │ Service  │  │ Service  │  │ Service  │  │ Profile  │
-│  ✅ 8081 │  │  📋 8082 │  │  📋 8083 │  │ Service  │
+│  ✅ 8081 │  │  ✅ 8082 │  │  📋 8083 │  │ Service  │
 │ MongoDB  │  │ MongoDB  │  │ MongoDB  │  │  ✅ 8084 │
 └──────────┘  └──────────┘  └──────────┘  │ MongoDB  │
       │              │              │      └──────────┘
@@ -86,7 +86,7 @@ SkillHub is a modern microservices-based platform that connects job seekers with
 | **API Gateway** | 8080 | - | ✅ Complete | Routes all client requests |
 | **Auth Service** | 8081 | MongoDB | ✅ Complete | [View Docs](./auth-service/README.md) |
 | **User Profile Service** | 8084 | MongoDB | ✅ Complete | [View Docs](./user-profile-service/README.md) |
-| **Course Service** | 8082 | MongoDB | 📋 Planned | Course catalog & reviews |
+| **Course Service** | 8082 | MongoDB | ✅ Complete | Course catalog & reviews |
 | **Enrollment Service** | 8085 | MongoDB | 📋 Planned | Course enrollments & certificates |
 | **Job Service** | 8083 | MongoDB | 📋 Planned | Job postings & search |
 | **Application Service** | 8086 | MongoDB | 📋 Planned | Job applications tracking |
@@ -119,7 +119,7 @@ SkillHub is a modern microservices-based platform that connects job seekers with
 - **Token Refresh** mechanism
 - **Logout** with token blacklist
 
-### ✅ User Profile Service ⭐ NEW!
+### ✅ User Profile Service
 - **Profile Management** (CRUD operations)
 - **Skills Management** (add/remove with case-insensitive deduplication)
 - **Experience Tracking** (full work history with CRUD)
@@ -131,13 +131,27 @@ SkillHub is a modern microservices-based platform that connects job seekers with
 - **Global Exception Handling** (consistent error responses)
 - **Bean Validation** (input validation at DTO layer)
 
+### ✅ Course Service ⭐ NEW!
+- **Course Catalog Management** (create, update, delete courses)
+- **Course Lifecycle** (DRAFT → PUBLISHED → ARCHIVED workflow)
+- **Advanced Search** (full-text search on title/description)
+- **Smart Filtering** (by category, level, tags, status)
+- **Review System** (1-5 star ratings with comments)
+- **Automated Rating Calculation** (real-time average updates)
+- **Trending Algorithm** (based on enrollments, ratings, views)
+- **View Tracking** (analytics for course popularity)
+- **Duplicate Review Prevention** (one review per user per course)
+- **MongoDB Text Indexes** (optimized search performance)
+- **Pagination & Sorting** (efficient data retrieval)
+- **Bean Validation** (comprehensive input validation)
+
 ---
 
 ## 🛠️ Technology Stack
 
 ### Backend
 - **Java 21** - Modern Java features (Records, Virtual Threads, Pattern Matching)
-- **Spring Boot 4.0.0** - Application framework
+- **Spring Boot 3.2.1** - Application framework
 - **Spring Cloud Gateway** - API Gateway
 - **Spring Cloud Netflix Eureka** - Service discovery
 - **Spring Security 6** - Authentication & authorization
@@ -156,7 +170,7 @@ SkillHub is a modern microservices-based platform that connects job seekers with
 - **Git** - Version control
 
 ### Frontend (Planned)
-- **React 18** with Vite
+- **React 19** with Vite
 - **Tailwind CSS** - Styling
 - **Axios** - HTTP client
 - **React Router** - Navigation
@@ -215,14 +229,21 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-6. **Start User Profile Service** 
+6. **Start User Profile Service**
 ```bash
 cd user-profile-service
 mvn clean install
 mvn spring-boot:run
 ```
 
-7. **Verify all services are running**
+7. **Start Course Service** ⭐ NEW!
+```bash
+cd course-service
+mvn clean install
+mvn spring-boot:run
+```
+
+8. **Verify all services are running**
 
 Check Eureka Dashboard: http://localhost:8761
 
@@ -230,6 +251,7 @@ You should see:
 - ✅ API-GATEWAY
 - ✅ AUTH-SERVICE
 - ✅ USER-PROFILE-SERVICE
+- ✅ COURSE-SERVICE
 
 ---
 
@@ -254,6 +276,12 @@ MONGODB_URI=mongodb://localhost:27017/skillhub_profiles
 SPRING_PROFILES_ACTIVE=dev
 ```
 
+### Course Service (`course-service/.env`) ⭐ NEW!
+```env
+MONGODB_URI=mongodb://localhost:27017/skillhub_courses
+SPRING_PROFILES_ACTIVE=dev
+```
+
 ---
 
 ## 📡 API Endpoints
@@ -273,7 +301,7 @@ All requests go through the API Gateway at `http://localhost:8080`
 | POST | `/api/auth/logout` | Logout and invalidate token | Yes |
 | GET | `/api/auth/validate-token` | Validate JWT token | Yes |
 
-### User Profile Service Endpoints ⭐ NEW!
+### User Profile Service Endpoints
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
@@ -294,18 +322,55 @@ All requests go through the API Gateway at `http://localhost:8080`
 | GET | `/api/profiles/search/skills?skills=Java,Spring` | Search by skills | Yes |
 | GET | `/api/profiles/search/location?location=Tunis` | Search by location | Yes |
 
-### Example: Create Profile
+### Course Service Endpoints ⭐ NEW!
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/courses` | Create new course | Yes |
+| GET | `/api/courses` | Get all courses (paginated) | No |
+| GET | `/api/courses/{id}` | Get course by ID | No |
+| PUT | `/api/courses/{id}` | Update course | Yes |
+| DELETE | `/api/courses/{id}` | Delete course | Yes |
+| PATCH | `/api/courses/{id}/publish` | Publish course | Yes |
+| PATCH | `/api/courses/{id}/archive` | Archive course | Yes |
+| GET | `/api/courses/status/{status}` | Filter by status | No |
+| GET | `/api/courses/category/{category}` | Filter by category | No |
+| GET | `/api/courses/level/{level}` | Filter by level | No |
+| GET | `/api/courses/search?keyword={keyword}` | Search courses | No |
+| GET | `/api/courses/trending` | Get trending courses | No |
+| POST | `/api/courses/{courseId}/reviews` | Add review | Yes |
+| GET | `/api/courses/{courseId}/reviews` | Get course reviews | No |
+
+### Example: Create Course
 ```bash
-curl -X POST http://localhost:8080/api/profiles \
+curl -X POST http://localhost:8080/api/courses \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Spring Boot Microservices Masterclass",
+    "description": "Learn to build production-ready microservices with Spring Boot, Spring Cloud, and Docker",
+    "instructor": "John Doe",
+    "category": "Software Development",
+    "tags": ["Spring Boot", "Microservices", "Java"],
+    "level": "INTERMEDIATE",
+    "duration": 40,
+    "price": 99.99,
+    "discountPrice": 79.99
+  }'
+```
+
+### Example: Search Courses
+```bash
+curl "http://localhost:8080/api/courses/search?keyword=Spring&page=0&size=10"
+```
+
+### Example: Add Review
+```bash
+curl -X POST http://localhost:8080/api/courses/{courseId}/reviews \
   -H "Content-Type: application/json" \
   -H "X-User-Id: 673f4e8a9b1c2d3e4f5a6b7c" \
   -d '{
-    "firstName": "Ahmed",
-    "lastName": "Ben Salem",
-    "title": "Junior Java Developer",
-    "bio": "Passionate about microservices",
-    "phoneNumber": "+216 12 345 678",
-    "location": "Tunis, Tunisia"
+    "rating": 5,
+    "comment": "Excellent course! Very clear explanations and great examples."
   }'
 ```
 
@@ -335,6 +400,11 @@ curl http://localhost:8081/actuator/health
 curl http://localhost:8084/actuator/health
 ```
 
+**Course Service Health:** ⭐ NEW!
+```bash
+curl http://localhost:8082/actuator/health
+```
+
 ---
 
 ## 📂 Project Structure
@@ -362,7 +432,7 @@ skillhub-microservices/
 │   ├── .env.example
 │   └── README.md
 │
-├── user-profile-service/        # User Profile Service (Port 8084) ✅ NEW!
+├── user-profile-service/        # User Profile Service (Port 8084) ✅
 │   ├── src/
 │   │   └── main/
 │   │       ├── java/com/skillhub/profile/
@@ -391,7 +461,39 @@ skillhub-microservices/
 │   ├── pom.xml
 │   └── README.md
 │
-├── course-service/              # 📋 Planned (Port 8082)
+├── course-service/              # Course Service (Port 8082) ✅ NEW!
+│   ├── src/
+│   │   └── main/
+│   │       ├── java/com/skillhub/course/
+│   │       │   ├── CourseServiceApplication.java
+│   │       │   ├── controller/
+│   │       │   │   ├── CourseController.java
+│   │       │   │   └── ReviewController.java
+│   │       │   ├── service/
+│   │       │   │   ├── CourseService.java
+│   │       │   │   └── CourseServiceImpl.java
+│   │       │   ├── repository/
+│   │       │   │   ├── CourseRepository.java
+│   │       │   │   └── ReviewRepository.java
+│   │       │   ├── model/
+│   │       │   │   ├── Course.java
+│   │       │   │   ├── CourseReview.java
+│   │       │   │   ├── CourseLevel.java
+│   │       │   │   └── CourseStatus.java
+│   │       │   ├── dto/
+│   │       │   │   ├── CourseRequest.java
+│   │       │   │   ├── CourseResponse.java
+│   │       │   │   ├── ReviewRequest.java
+│   │       │   │   └── ReviewResponse.java
+│   │       │   └── exception/
+│   │       │       ├── CourseNotFoundException.java
+│   │       │       └── GlobalExceptionHandler.java
+│   │       └── resources/
+│   │           └── application.yml
+│   ├── pom.xml
+│   ├── SkillHub-Course-Service.postman_collection.json
+│   └── README.md
+│
 ├── enrollment-service/          # 📋 Planned (Port 8085)
 ├── job-service/                 # 📋 Planned (Port 8083)
 ├── application-service/         # 📋 Planned (Port 8086)
@@ -421,9 +523,9 @@ skillhub-microservices/
 - [x] API Gateway with security
 - [x] Auth Service with JWT
 
-### Phase 2: Core Services 🚧 (In Progress - 50% Complete)
-- [x] User Profile Service ✅ **JUST COMPLETED!**
-- [ ] Course Service with reviews
+### Phase 2: Core Services 🚧 (In Progress - 66% Complete)
+- [x] User Profile Service ✅
+- [x] Course Service with reviews ✅ **JUST COMPLETED!**
 - [ ] Enrollment Service with Saga pattern
 
 ### Phase 3: Job Matching 📋 (Planned)
@@ -448,22 +550,29 @@ skillhub-microservices/
 ## 💡 Key Architectural Decisions
 
 ### Why MongoDB?
-- Document database perfect for nested data (Experience, Education)
+- Document database perfect for nested data (Experience, Education, Reviews)
 - No JOINs needed (embedded documents)
 - Flexible schema for evolving requirements
+- Text search capabilities for course discovery
 - Horizontal scaling capability
 
 ### Why Microservices?
-- **Independent Scaling**: Profile service can scale separately from Auth
+- **Independent Scaling**: Course service can scale separately from Auth
 - **Technology Flexibility**: Each service can use different tech stack
 - **Team Independence**: Different teams work on different services
 - **Fault Isolation**: If one service fails, others continue working
 
-### Why Embedded Documents (Experience/Education)?
-- Always queried together with profile
+### Why Embedded Documents (Reviews, Experience, Education)?
+- Always queried together with parent entity
 - Eliminates expensive JOINs
-- Atomic updates (update profile + experience in one operation)
-- Better performance (one database query instead of three)
+- Atomic updates (update course + reviews in one operation)
+- Better performance (one database query instead of multiple)
+
+### Why Text Indexes in Course Service?
+- Full-text search on title and description
+- Case-insensitive search capabilities
+- Better search performance for large datasets
+- Natural language search support
 
 ---
 
